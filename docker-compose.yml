@@ -1,0 +1,54 @@
+services:
+  redis:
+    image: redis:alpine3.22
+    container_name: redis
+    restart: always
+    expose:
+      - ${REDIS_PORT}
+
+  db:
+    image: postgres:15.2
+    restart: always
+    depends_on:
+      - redis
+    expose:
+      - ${DB_PORT}
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    container_name: ${DB_NAME}
+    volumes:
+      - projectaditoria_volume:/var/lib/postgresql/data
+
+  backend:
+    image: robertosantizo414/projectauditoria_backend:latest
+    restart: always
+    pull_policy: always
+    depends_on:
+      - db
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      FRONT_END_URL: ${FRONT_END_URL}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+  app:
+    container_name: react_app
+    image: robertosantizo414/static-website:latest
+    pull_policy: always
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+    environment:
+      - VITE_BASE_URL=${BASE_URL}
+
+volumes:
+  projectaditoria_volume:
+    external: false
