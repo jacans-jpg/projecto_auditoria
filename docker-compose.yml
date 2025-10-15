@@ -34,7 +34,7 @@ services:
       PORT: ${PORT}
       JWT_SECRET: ${JWT_SECRET}
       FRONT_END_URL: ${FRONT_END_URL}
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/postgres
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
   app:
@@ -46,8 +46,6 @@ services:
       - backend
     ports:
       - ${HTTP_PORT}:${HTTP_PORT}
-    environment:
-      - VITE_BASE_URL=${BASE_URL}
 
 volumes:
   projectaditoria_volume:
